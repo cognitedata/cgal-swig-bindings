@@ -1,9 +1,7 @@
 name: Windows Tests
 
-on: 
-  push:
-    branches:
-      - master
+on: [pull_request]
+
 jobs:
   build:
     runs-on: windows-2016
@@ -124,8 +122,6 @@ jobs:
         for py_file in *.py; do
           python.exe $py_file || exit 1
         done
-        cd ../..
-        twine upload -r testpypi dist/*  -u "cgal" -p ${{ secrets.TPPPW }} --non-interactive --skip-existing
       shell: bash
 
 #    - name: Upload wheel
