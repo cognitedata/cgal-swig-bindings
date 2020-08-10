@@ -2,9 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+	
     <groupId>com.cognite.cgal4j</groupId>
     <artifactId>cgal4j</artifactId>
-    <version>5.0.2</version>
+    <version>5.0.2-SNAPSHOT</version>
+	
+    <name>CGAL5J binding</name>
+    <url>https://github.com/cognitedata/cgal-swig-bindings</url>
+    <description>Java CGAL5J binding.</description>
+	
+    <scm>
+      <connection>scm:git:git@github.com:cognitedata/cgal-swig-bindings.git</connection>
+      <url>scm:git:git@github.com:cognitedata/cgal-swig-bindings.git</url>
+      <developerConnection>scm:git:git@github.com:cognitedata/cgal-swig-bindings.git</developerConnection>
+      <tag>HEAD</tag>
+    </scm>
+	
+	
     <packaging>jar</packaging>
     	<build>
 		<plugins>
@@ -80,7 +94,9 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>copy-lib-canonical</id>
@@ -256,4 +272,13 @@
 			</properties>
 		</profile>
 	</profiles>
+	
+	
+    <distributionManagement>
+        <snapshotRepository>
+           <id>cognite.jfrog.io</id>
+           <name>Cognite maven snapshots</name>
+           <url>https://cognite.jfrog.io/cognite/libs-snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
