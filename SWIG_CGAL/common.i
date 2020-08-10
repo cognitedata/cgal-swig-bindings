@@ -14,26 +14,16 @@
 
 %define SWIG_CGAL_add_java_loadLibrary_CGAL_Java()
   %pragma(java) jniclasscode=%{
-    static{
-      try {
-          System.loadLibrary("CGAL_Java");
-      } catch (UnsatisfiedLinkError e) {
-        System.err.println("Native code library CGAL_Java failed to load. \n" + e);
-        throw e;
-      }
-    }
+    static {
+	    CGAL.CGALNative.load("CGAL_Java");
+	}
   %}      
 %enddef
 
 %define SWIG_CGAL_add_java_loadLibrary(NAME)
   %pragma(java) jniclasscode=%{
     static {
-      try {
-          System.loadLibrary("NAME");
-      } catch (UnsatisfiedLinkError e) {
-        System.err.println("Native code library NAME failed to load. \n" + e);
-        throw e;
-      }
+        CGAL.CGALNative.load("NAME");
     }
   %}
   // always load CGAL_Java to get JNI_OnLoad called
