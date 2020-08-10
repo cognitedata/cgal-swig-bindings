@@ -276,9 +276,9 @@
 	
     <distributionManagement>
         <snapshotRepository>
-           <id>cognite.jfrog.io</id>
+		   <id>snapshots.cognite.jfrog.io</id>
            <name>Cognite maven snapshots</name>
-           <url>https://cognite.jfrog.io/cognite/libs-snapshot</url>
+           <url>https://cognite.jfrog.io/cognite/libs-snapshot-local/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
