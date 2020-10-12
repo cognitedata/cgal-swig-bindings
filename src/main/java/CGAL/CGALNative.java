@@ -8,6 +8,17 @@ import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class CGALNative {
+	
+  private static final String[] REQUIRED_LIBS = new String[] {
+	  "CGAL_AABB_tree_cpp",
+	  "CGAL_Alpha_shape_2_cpp",
+	  "CGAL_Java_cpp",
+	  "CGAL_Kernel_cpp",
+	  "CGAL_Mesh_3_cpp",
+	  "CGAL_Surface_mesher_cpp",
+	  "CGAL_Triangulation_2_cpp",
+	  "CGAL_Triangulation_3_cpp"
+  };
 
   private static final ConcurrentHashMap<String, Boolean> LIB_LOADED = new ConcurrentHashMap<>();
 
@@ -47,6 +58,12 @@ public final class CGALNative {
 
   private static String errorMessage(String libnameShort) {
     return String.format(ERROR_MSG, resourceName(libnameShort), libnameShort, "lib" + libnameShort);
+  }
+  
+  public static void loadRequired() {
+	  for(String libName : REQUIRED_LIBS) {
+		  load(libName);
+	  }
   }
 
   public static void load(String libnameShort) {

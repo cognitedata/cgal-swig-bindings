@@ -29,7 +29,6 @@
 				<configuration>
 					<compilerArgs>
 						<arg>-Xdiags:verbose</arg>
-						<arg>-Werror</arg>
 						<arg>-Xlint:all,-module</arg>
 						<arg>-Xpkginfo:always</arg>
 					</compilerArgs>
@@ -88,7 +87,7 @@
 						<configuration>
 							<projectDirectory>${project.build.directory}/${build.type}/${platform}/cmake</projectDirectory>
 							<classifier>${cmake.classifier}</classifier>
-							<config>${cmake.config} -j 4</config>
+							<config>${cmake.config}</config>
 						</configuration>
 					</execution>
 				</executions>
@@ -109,6 +108,19 @@
 							<resources>
 								<resource>
 									<directory>${project.build.directory}/${build.type}/${platform}/java/lib</directory>
+									<includes>
+										<!-- windows -->
+										<include>*.dll</include>
+										<include>*.pdb</include>
+										<!-- linux -->
+										<include>*.so</include>
+										<!-- mac -->
+										<include>*.dylib</include>
+										<include>*.jnilib</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>${project.build.directory}/${build.type}/${platform}/cmake/lib</directory>
 									<includes>
 										<!-- windows -->
 										<include>*.dll</include>
