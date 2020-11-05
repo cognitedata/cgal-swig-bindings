@@ -1,26 +1,34 @@
 package CGAL;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class CGALNative {
-	
+
   private static final String[] REQUIRED_LIBS = new String[] {
-	  "CGAL_AABB_tree_cpp",
-	  "CGAL_Alpha_shape_2_cpp",
-	  "CGAL_Java_cpp",
-	  "CGAL_Kernel_cpp",
-	  "CGAL_Mesh_3_cpp",
-	  "CGAL_Surface_mesher_cpp",
-	  "CGAL_Triangulation_2_cpp",
-	  "CGAL_Triangulation_3_cpp"
+      "CGAL_AABB_tree_cpp",
+      "CGAL_Alpha_shape_2_cpp",
+      "CGAL_Java_cpp",
+      "CGAL_Kernel_cpp",
+      "CGAL_Mesh_3_cpp",
+      "CGAL_Surface_mesher_cpp",
+      "CGAL_Triangulation_2_cpp",
+      "CGAL_Triangulation_3_cpp"
   };
 
   private static final ConcurrentHashMap<String, Boolean> LIB_LOADED = new ConcurrentHashMap<>();
+
+  private static final AtomicReference<File> TMP_LOCATION = new AtomicReference<File>();
 
   private static final String ERROR_MSG =
       "Unsupported OS/arch, cannot find %s or load %s from system libraries. "
@@ -59,15 +67,30 @@ public final class CGALNative {
   private static String errorMessage(String libnameShort) {
     return String.format(ERROR_MSG, resourceName(libnameShort), libnameShort, "lib" + libnameShort);
   }
-  
+
   public static void loadRequired() {
-	  for(String libName : REQUIRED_LIBS) {
-		  load(libName);
-	  }
+    for (String libName : REQUIRED_LIBS) {
+      load(libName);
+    }
   }
 
   public static void load(String libnameShort) {
     load(libnameShort, null);
+  }
+
+  public static File getTemporaryLocation() {
+    File location = TMP_LOCATION.get();
+    if (location == null) {
+      try {
+        Path tempDirWithPrefix = Files.createTempDirectory("cgal");
+        location = tempDirWithPrefix.toAbsolutePath().toFile();
+      } catch (IOException e) {
+        location = new File("./");
+      }
+      TMP_LOCATION.set(location);
+      location.deleteOnExit();
+    }
+    return location;
   }
 
   public static void load(String libnameShort, final File tempFolder) {
@@ -89,29 +112,13 @@ public final class CGALNative {
         throw err;
       }
     }
-    File tempLib = null;
-    FileOutputStream out = null;
+    File tempLib = getTemporaryLocation();
     try {
-      tempLib = File.createTempFile("lib" + libnameShort, "." + libExtension(), tempFolder);
-      // try to delete on exit, does not work on Windows
-      tempLib.deleteOnExit();
-      // copy to tempLib
-      out = new FileOutputStream(tempLib);
-      byte[] buf = new byte[4096];
-      while (true) {
-        int read = is.read(buf);
-        if (read == -1) {
-          break;
-        }
-        out.write(buf, 0, read);
+      if (!tempLib.exists()) {
+        String libDirectory = "/" + Path.of(osName() + "-" + osArch());
+        copyAll(libDirectory, tempLib);
       }
-      try {
-        out.flush();
-        out.close();
-        out = null;
-      } catch (IOException e) {
-        // ignore
-      }
+
       try {
         System.load(tempLib.getAbsolutePath());
       } catch (UnsatisfiedLinkError e) {
@@ -139,14 +146,44 @@ public final class CGALNative {
     } finally {
       try {
         is.close();
-        if (out != null) {
-          out.close();
-        }
         if (tempLib != null && tempLib.exists()) {
           tempLib.delete();
         }
       } catch (IOException e) {
         // ignore
+      }
+    }
+  }
+
+  private static void copyAll(String libDirectory, File tempLib) throws IOException {
+    List<String> filenames = new ArrayList<>();
+    try (InputStream is = CGALNative.class.getResourceAsStream(libDirectory)) {
+      BufferedReader br = new BufferedReader(new InputStreamReader(is));
+      String resource;
+      while ((resource = br.readLine()) != null) {
+        System.out.println(resource);
+        filenames.add(resource);
+      }
+    }
+
+    for (String file : filenames) {
+      try (InputStream is = CGALNative.class.getResourceAsStream(file)) {
+        File newLocation = new File(tempLib, file);
+        System.out.println(file + " to " + newLocation);
+        copy(is, newLocation.toString());
+      }
+    }
+  }
+
+  private static void copy(InputStream is, String pathFile) throws IOException {
+    try (FileOutputStream out = new FileOutputStream(pathFile)) {
+      byte[] buf = new byte[4096];
+      while (true) {
+        int read = is.read(buf);
+        if (read == -1) {
+          break;
+        }
+        out.write(buf, 0, read);
       }
     }
   }
