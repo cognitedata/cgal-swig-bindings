@@ -118,9 +118,10 @@ public final class CGALNative {
         String libDirectory = "/" + Path.of(osName() + "-" + osArch());
         copyAll(libDirectory, tempLib);
       }
-
+      File tmpLibNi = new File(tempLib, libnameShort + "." + libExtension());
       try {
-        System.load(tempLib.getAbsolutePath());
+        System.out.println("Load: " + tmpLibNi);
+        System.load(tmpLibNi.getAbsolutePath());
       } catch (UnsatisfiedLinkError e) {
         // fall-back to loading the zstd-jni from the system library path
         try {
@@ -188,3 +189,4 @@ public final class CGALNative {
     }
   }
 }
+
