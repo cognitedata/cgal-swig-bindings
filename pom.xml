@@ -201,7 +201,7 @@
 	<properties>
 		<classifier>${platform}</classifier>
 		<download.cmake>false</download.cmake>
-		<cmake.version>3.17.3-b1</cmake.version>
+		<cmake.version>3.18.4-b1</cmake.version>
 		<java.version>11</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
@@ -256,6 +256,7 @@
 				<classifier>linux-x86_64</classifier>
 				<platform>linux-amd64</platform>
 				<build.type>release</build.type>
+				<cmake.options>-DCMAKE_BUILD_TYPE=Release</cmake.options>
 				<cmake.classifier>linux-x86_64</cmake.classifier>
 			</properties>
 		</profile>
