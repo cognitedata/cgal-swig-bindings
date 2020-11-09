@@ -71,6 +71,7 @@
 								<option>${cmake.options}</option>
 								<option>-DBUILD_PYTHON=OFF</option>
 								<option>-DJAVA_OUTDIR_PREFIX=../java</option>
+								<option>-DCGAL_HEADER_ONLY=OFF</option>
 								<option>-DCGAL_DIR=/usr/local/include/CGAL</option>
 							</options>
 							<environmentVariables>
