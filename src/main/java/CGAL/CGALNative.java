@@ -114,13 +114,17 @@ public final class CGALNative {
     }
     File tempLib = getTemporaryLocation();
     try {
-      if (!tempLib.exists()) {
-        String libDirectory = "/" + Path.of(osName() + "-" + osArch());
-        copyAll(libDirectory, tempLib);
-      }
+      //if (!tempLib.exists()) {
+      //  String libDirectory = "/" + Path.of(osName() + "-" + osArch());
+      //  copyAll(libDirectory, tempLib);
+      //}
       File tmpLibNi = new File(tempLib, libnameShort + "." + libExtension());
+      if(!tmpLibNi.exists()) {
+	String libDirectory = "/" + Path.of(osName() + "-" + osArch());
+	copyAll(libDirectory, tempLib);
+      }
       try {
-        System.out.println("Load: " + tmpLibNi);
+        //System.out.println("Load: " + tmpLibNi);
         System.load(tmpLibNi.getAbsolutePath());
       } catch (UnsatisfiedLinkError e) {
         // fall-back to loading the zstd-jni from the system library path
