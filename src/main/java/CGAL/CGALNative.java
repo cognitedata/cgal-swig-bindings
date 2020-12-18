@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-
+import java.util.jar.JarInputStream;
+import java.util.jar.JarEntry;
+	
 public final class CGALNative {
 
   private static final String[] REQUIRED_LIBS = new String[] {
@@ -112,20 +114,14 @@ public final class CGALNative {
         throw err;
       }
     }
-    File tempLib = getTemporaryLocation();
     try {
-      //if (!tempLib.exists()) {
-      //  String libDirectory = "/" + Path.of(osName() + "-" + osArch());
-      //  copyAll(libDirectory, tempLib);
-      //}
-      File tmpLibNi = new File(tempLib, libnameShort + "." + libExtension());
-      if(!tmpLibNi.exists()) {
-	String libDirectory = "/" + Path.of(osName() + "-" + osArch());
-	copyAll(libDirectory, tempLib);
-      }
+		File tempLib = File.createTempFile("cgal", "." + libnameShort, tempFolder);
+		// try to delete on exit, does not work on Windows
+		tempLib.deleteOnExit();
+		copyLib(id, tempLib);
+     
       try {
-        //System.out.println("Load: " + tmpLibNi);
-        System.load(tmpLibNi.getAbsolutePath());
+        System.load(tempLib.getAbsolutePath());
       } catch (UnsatisfiedLinkError e) {
         // fall-back to loading the zstd-jni from the system library path
         try {
@@ -160,37 +156,18 @@ public final class CGALNative {
     }
   }
 
-  private static void copyAll(String libDirectory, File tempLib) throws IOException {
-    List<String> filenames = new ArrayList<>();
-    try (InputStream is = CGALNative.class.getResourceAsStream(libDirectory)) {
-      BufferedReader br = new BufferedReader(new InputStreamReader(is));
-      String resource;
-      while ((resource = br.readLine()) != null) {
-        System.out.println(resource);
-        filenames.add(resource);
-      }
-    }
-
-    for (String file : filenames) {
-      try (InputStream is = CGALNative.class.getResourceAsStream(file)) {
-        File newLocation = new File(tempLib, file);
-        System.out.println(file + " to " + newLocation);
-        copy(is, newLocation.toString());
-      }
-    }
-  }
-
-  private static void copy(InputStream is, String pathFile) throws IOException {
-    try (FileOutputStream out = new FileOutputStream(pathFile)) {
-      byte[] buf = new byte[4096];
-      while (true) {
-        int read = is.read(buf);
-        if (read == -1) {
-          break;
-        }
-        out.write(buf, 0, read);
-      }
-    }
-  }
+  private static void copyLib(InputStream is, File tempLib)
+       throws IOException {
+       try (FileOutputStream out = new FileOutputStream(tempLib)) {
+         byte[] buf = new byte[4096];
+         while (true) {
+           int read = is.read(buf);
+           if (read == -1) {
+             break;
+           }
+           out.write(buf, 0, read);
+         }
+       }
+   }
 }
 
