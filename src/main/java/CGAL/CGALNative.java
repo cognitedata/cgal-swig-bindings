@@ -114,11 +114,13 @@ public final class CGALNative {
         throw err;
       }
     }
+	File tempLib = null;
     try {
-		File tempLib = File.createTempFile("cgal", "." + libnameShort, tempFolder);
+		tempLib = File.createTempFile("cgal", resourceName, tempFolder);
 		// try to delete on exit, does not work on Windows
 		tempLib.deleteOnExit();
-		copyLib(id, tempLib);
+		
+		copyLib(is, tempLib);
      
       try {
         System.load(tempLib.getAbsolutePath());
